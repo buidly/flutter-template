@@ -7,6 +7,7 @@ import 'package:fluttertemplate/core/models/transaction.dart';
 import 'package:fluttertemplate/core/models/transaction_response.dart';
 import 'package:fluttertemplate/core/services/wallet_connection_service.dart';
 import 'package:fluttertemplate/core/utils/apply_tx_signature.dart';
+import 'package:fluttertemplate/layers/domain/entity/transaction_on_network.dart';
 import 'package:fluttertemplate/layers/domain/usecase/get_transactions.dart';
 import 'package:fluttertemplate/layers/domain/usecase/send_transactions.dart';
 import 'package:fluttertemplate/layers/presentation/using_bloc/transaction/bloc/transaction_state.dart';
@@ -55,7 +56,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     List<Transaction> signedTransactions =
         getSignedTransactions(signResponse, event);
 
-    List<String> txHashes = await sendTransactions.call(signedTransactions);
+    List<String> txHashes = await sendTransactions(signedTransactions);
     if (txHashes.isEmpty) {
       emit(
         state.copyWith(
@@ -71,6 +72,8 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         txHashes: txHashes,
       ),
     );
+
+    await checkTransactionsStatus(txHashes, emit);
   }
 
   List<Transaction> getSignedTransactions(
@@ -113,5 +116,26 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       options: responseMap['options'],
       version: responseMap['version'],
     );
+  }
+
+  Future<void> checkTransactionsStatus(
+    List<String> hashes,
+    Emitter<TransactionState> emit,
+  ) async {
+    while (true) {
+      List<TransactionOnNetwork> transactions = await getTransactions(hashes);
+
+      bool allCompleted = transactions.every((tx) => tx.status != 'pending');
+      if (allCompleted) {
+        emit(
+          state.copyWith(
+            status: TransactionStatus.initial,
+          ),
+        );
+        break;
+      }
+
+      await Future.delayed(const Duration(seconds: 6));
+    }
   }
 }

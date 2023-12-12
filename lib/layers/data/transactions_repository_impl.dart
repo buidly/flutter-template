@@ -14,14 +14,12 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
   Future<List<TransactionOnNetwork>> getTransactions(
     List<String> hashes,
   ) async {
-    print('call repo');
     final fetchedList = await _api.getTransactions(hashes);
     return fetchedList;
   }
 
   @override
   Future<List<String>> sendTransactions(List<Transaction> transactions) async {
-    print('call repo');
     final hashes = await _api.sendTransactions(transactions);
     return hashes;
   }

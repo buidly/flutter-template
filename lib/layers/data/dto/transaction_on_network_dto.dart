@@ -1,31 +1,39 @@
 import 'package:fluttertemplate/layers/domain/entity/transaction_on_network.dart';
 
 class TransactionOnNetworkDto extends TransactionOnNetwork {
-  TransactionOnNetworkDto({
-    required super.signature,
-    super.guardian,
-    super.guardianSignature,
-    super.options,
-    super.version,
+  const TransactionOnNetworkDto({
+    super.sender = '',
+    super.receiver = '',
+    super.nonce = 0,
+    super.value = '',
+    super.signature = '',
+    super.txHash = '',
+    super.status = '',
+    super.function,
   });
 
-  factory TransactionOnNetworkDto.fromMap(Map<String, dynamic> json) =>
-      TransactionOnNetworkDto(
-        signature: json['signature'],
-        guardian: json['guardian'],
-        guardianSignature: json['guardianSignature'],
-        options: json['options'],
-        version: json['version'],
-      );
+  factory TransactionOnNetworkDto.fromMap(Map<String, dynamic> json) {
+    return TransactionOnNetworkDto(
+      sender: json['sender'],
+      receiver: json['receiver'],
+      nonce: json['nonce'] as int,
+      value: json['value'],
+      function: json['function'],
+      signature: json['signature'],
+      txHash: json['txHash'],
+      status: json['status'],
+    );
+  }
 
   Map<String, dynamic> toMap() {
-    final Map<String, dynamic> data = {
+    return {
+      'sender': sender,
+      'receiver': receiver,
+      'nonce': nonce,
+      'value': value,
       'signature': signature,
-      'guardian': guardian,
-      'guardianSignature': guardianSignature,
-      'options': options,
-      'version': version,
+      'txHash': txHash,
+      'status': status,
     };
-    return data;
   }
 }

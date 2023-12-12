@@ -1,21 +1,34 @@
 import 'package:equatable/equatable.dart';
 
-class TransactionOnNetwork with EquatableMixin {
+class TransactionOnNetwork extends Equatable {
+  final String sender;
+  final String receiver;
+  final int nonce;
+  final String value;
   final String signature;
-  final String? guardian;
-  final String? guardianSignature;
-  final int? options;
-  final int? version;
+  final String txHash;
+  final String status;
+  final String? function;
 
-  TransactionOnNetwork({
+  const TransactionOnNetwork({
+    required this.sender,
+    required this.receiver,
+    required this.nonce,
+    required this.value,
     required this.signature,
-    this.guardian,
-    this.guardianSignature,
-    this.options,
-    this.version,
+    required this.txHash,
+    this.function,
+    required this.status,
   });
 
   @override
-  List<Object?> get props =>
-      [signature, guardian, guardianSignature, options, version];
+  List<Object?> get props => [
+        sender,
+        receiver,
+        nonce,
+        value,
+        signature,
+        txHash,
+        status,
+      ];
 }
