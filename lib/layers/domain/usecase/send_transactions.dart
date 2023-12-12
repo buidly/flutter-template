@@ -9,7 +9,6 @@ class SendTransactions {
   final TransactionsRepository _repository;
 
   Future<List<String>> call(List<Transaction> transactions) async {
-    print('call usecase with');
     final list = await _repository.sendTransactions(transactions);
     return list;
   }

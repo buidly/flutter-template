@@ -26,13 +26,12 @@ class TransactionsApiImpl implements TransactionsApi {
       Response<dynamic> response = await _dio.get(
           '${AppConstants.api}/transactions',
           queryParameters: {'hashes': hashes.join(',')});
-      print(response.data);
+
       final l = (response.data as List)
           .map((e) => TransactionOnNetworkDto.fromMap(e))
           .toList();
       return l;
     } catch (e) {
-      print(e);
       developer.log(e.toString());
       return [];
     }
@@ -43,7 +42,6 @@ class TransactionsApiImpl implements TransactionsApi {
     List<Transaction> transactions,
   ) async {
     try {
-      print('call api');
       Response<dynamic> response = await _dio.post(
         '${AppConstants.api}/transaction/send-multiple',
         data: jsonEncode(transactions),
@@ -56,11 +54,8 @@ class TransactionsApiImpl implements TransactionsApi {
           ? txsHashesMap.values.cast<String>().toList()
           : [];
 
-//{"data":{"numOfSentTxs":0,"txsHashes":{}},"code":"successful"}
-      print(txsHashes);
       return txsHashes;
     } catch (e) {
-      print(e);
       developer.log(e.toString());
       return [];
     }

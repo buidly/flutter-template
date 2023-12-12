@@ -9,7 +9,6 @@ class GetTransactions {
   final TransactionsRepository _repository;
 
   Future<List<TransactionOnNetwork>> call(List<String> hashes) async {
-    print('call usecase');
     final list = await _repository.getTransactions(hashes);
     return list;
   }

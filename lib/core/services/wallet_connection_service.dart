@@ -7,9 +7,6 @@ class WalletConnectionService {
   String topic = '';
 
   Future<void> initializeClient() async {
-    print('initializing');
-    Stopwatch stopwatch = Stopwatch()..start();
-
     wcClient = await SignClient.createInstance(
       relayUrl: AppConstants.relayUrl,
       projectId: AppConstants.projectId,
@@ -19,13 +16,11 @@ class WalletConnectionService {
         url: 'https://walletconnect.com',
         icons: ['https://avatars.githubusercontent.com/u/37784886'],
         redirect: Redirect(
-          native: 'walletconnect://',
-          universal: 'https://www.walletconnect.com',
+          native: 'myflutterdapp://',
+          universal: 'https://walletconnect.com',
         ),
       ),
     );
-    stopwatch.stop();
-    print('Initialization took: ${stopwatch.elapsedMilliseconds}ms');
   }
 
   Future<String> connect() async {
