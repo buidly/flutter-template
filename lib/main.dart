@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertemplate/core/constants/app_constants.dart';
 import 'package:fluttertemplate/core/services/wallet_connection_service.dart';
 import 'package:fluttertemplate/core/utils/open_deep_link.dart';
+import 'package:fluttertemplate/flavor_settings.dart';
 import 'package:fluttertemplate/get_it.dart';
 import 'package:fluttertemplate/layers/domain/usecase/get_transactions.dart';
 import 'package:fluttertemplate/layers/domain/usecase/send_transactions.dart';
@@ -14,10 +15,10 @@ import 'package:fluttertemplate/layers/presentation/using_bloc/transaction/view/
 import 'package:fluttertemplate/layers/presentation/using_bloc/wallet_connect/bloc/wallet_connect_bloc.dart';
 import 'package:fluttertemplate/layers/presentation/using_bloc/wallet_connect/view/wallet_connect_button.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  setupDependencies();
+  await setupDependencies();
 
   final Alice alice = getIt<Alice>();
   final Dio dio = getIt<Dio>();
@@ -76,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool initialized = false;
   final GetTransactions getTransactions = getIt<GetTransactions>();
   final SendTransactions sendTransactions = getIt<SendTransactions>();
+  final FlavorSettings flavorSettings = getIt<FlavorSettings>();
   final WalletConnectionService walletConnService =
       getIt<WalletConnectionService>();
 
@@ -114,6 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
             walletConnectionService: walletConnService,
             sendTransactions: sendTransactions,
             getTransactions: getTransactions,
+            flavorSettings: flavorSettings,
           ),
         ),
       ],

@@ -7,6 +7,7 @@ import 'package:fluttertemplate/core/models/transaction.dart';
 import 'package:fluttertemplate/core/models/transaction_response.dart';
 import 'package:fluttertemplate/core/services/wallet_connection_service.dart';
 import 'package:fluttertemplate/core/utils/apply_tx_signature.dart';
+import 'package:fluttertemplate/flavor_settings.dart';
 import 'package:fluttertemplate/layers/domain/entity/transaction_on_network.dart';
 import 'package:fluttertemplate/layers/domain/usecase/get_transactions.dart';
 import 'package:fluttertemplate/layers/domain/usecase/send_transactions.dart';
@@ -18,11 +19,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
   final WalletConnectionService walletConnectionService;
   final SendTransactions sendTransactions;
   final GetTransactions getTransactions;
+  final FlavorSettings flavorSettings;
 
   TransactionBloc({
     required this.walletConnectionService,
     required this.sendTransactions,
     required this.getTransactions,
+    required this.flavorSettings,
   }) : super(const TransactionState()) {
     on<SignTransactionsEvent>(signTransactions);
   }
@@ -45,7 +48,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         : {'transaction': transactions[0].toJson()};
 
     final dynamic signResponse = await walletConnectionService.wcClient.request(
-      chainId: '${AppConstants.namespace}:${AppConstants.chainId}',
+      chainId: '${AppConstants.namespace}:${flavorSettings.chainId}',
       topic: walletConnectionService.topic,
       request: SessionRequestParams(
         method: method,

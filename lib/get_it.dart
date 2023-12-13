@@ -1,6 +1,8 @@
 import 'package:alice/alice.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertemplate/flavor_settings.dart';
 import 'package:get_it/get_it.dart';
 import 'package:fluttertemplate/core/services/wallet_connection_service.dart';
 import 'package:fluttertemplate/layers/data/source/network/transactions_api.dart';
@@ -11,7 +13,8 @@ import 'package:fluttertemplate/layers/domain/usecase/send_transactions.dart';
 
 final getIt = GetIt.instance;
 
-void setupDependencies() {
+Future<void> setupDependencies() async {
+  getIt.registerSingleton<FlavorSettings>(await _getFlavorSettings());
   getIt.registerSingleton<Dio>(Dio());
   getIt.registerSingleton<Alice>(
     Alice(
@@ -19,9 +22,11 @@ void setupDependencies() {
       showInspectorOnShake: kDebugMode,
     ),
   );
-  getIt.registerSingleton<WalletConnectionService>(WalletConnectionService());
+  getIt.registerSingleton<WalletConnectionService>(
+      WalletConnectionService(flavorSettings: getIt<FlavorSettings>()));
   getIt.registerFactory<TransactionsApi>(
-    () => TransactionsApiImpl(dio: getIt<Dio>()),
+    () => TransactionsApiImpl(
+        dio: getIt<Dio>(), flavorSettings: getIt<FlavorSettings>()),
   );
   getIt.registerFactory<TransactionsRepository>(
     () => TransactionsRepositoryImpl(api: getIt<TransactionsApi>()),
@@ -32,4 +37,22 @@ void setupDependencies() {
   getIt.registerFactory<SendTransactions>(
     () => SendTransactions(repository: getIt<TransactionsRepository>()),
   );
+}
+
+Future<FlavorSettings> _getFlavorSettings() async {
+  String flavor =
+      await const MethodChannel('flavor').invokeMethod<String>('getFlavor') ??
+          '';
+
+  print('STARTED WITH FLAVOR $flavor');
+
+  if (flavor == 'devnet') {
+    return FlavorSettings.devnet();
+  } else if (flavor == 'mainnet') {
+    return FlavorSettings.mainnet();
+  } else if (flavor == 'testnet') {
+    return FlavorSettings.testnet();
+  } else {
+    throw Exception("Unknown flavor: $flavor");
+  }
 }

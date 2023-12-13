@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:fluttertemplate/core/constants/app_constants.dart';
 import 'package:fluttertemplate/core/models/transaction.dart';
+import 'package:fluttertemplate/flavor_settings.dart';
 import 'package:fluttertemplate/layers/data/dto/transaction_on_network_dto.dart';
 import 'dart:developer' as developer;
 
@@ -12,19 +12,18 @@ abstract class TransactionsApi {
 }
 
 class TransactionsApiImpl implements TransactionsApi {
-  final Dio _dio;
+  final Dio dio;
+  final FlavorSettings flavorSettings;
 
-  TransactionsApiImpl({
-    required Dio dio,
-  }) : _dio = dio;
+  TransactionsApiImpl({required this.dio, required this.flavorSettings});
 
   @override
   Future<List<TransactionOnNetworkDto>> getTransactions(
     List<String> hashes,
   ) async {
     try {
-      Response<dynamic> response = await _dio.get(
-          '${AppConstants.api}/transactions',
+      Response<dynamic> response = await dio.get(
+          '${flavorSettings.apiUrl}/transactions',
           queryParameters: {'hashes': hashes.join(',')});
 
       final l = (response.data as List)
@@ -42,8 +41,8 @@ class TransactionsApiImpl implements TransactionsApi {
     List<Transaction> transactions,
   ) async {
     try {
-      Response<dynamic> response = await _dio.post(
-        '${AppConstants.api}/transaction/send-multiple',
+      Response<dynamic> response = await dio.post(
+        '${flavorSettings.apiUrl}/transaction/send-multiple',
         data: jsonEncode(transactions),
       );
 

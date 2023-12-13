@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertemplate/core/models/transaction.dart';
 import 'package:fluttertemplate/layers/presentation/using_bloc/transaction/bloc/transaction_bloc.dart';
 import 'package:fluttertemplate/layers/presentation/using_bloc/transaction/bloc/transaction_state.dart';
-import 'package:fluttertemplate/layers/presentation/using_bloc/wallet_connect/bloc/wallet_connect_bloc.dart';
 
 // -----------------------------------------------------------------------------
 // Button

@@ -1,8 +1,12 @@
 import 'package:fluttertemplate/core/constants/app_constants.dart';
+import 'package:fluttertemplate/flavor_settings.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 
 class WalletConnectionService {
   late final SignClient wcClient;
+  late final FlavorSettings flavorSettings;
+
+  WalletConnectionService({required this.flavorSettings});
 
   String topic = '';
 
@@ -26,8 +30,8 @@ class WalletConnectionService {
   Future<String> connect() async {
     ConnectResponse resp = await wcClient.connect(
       requiredNamespaces: {
-        AppConstants.namespace: const RequiredNamespace(
-          chains: ['${AppConstants.namespace}:${AppConstants.chainId}'],
+        AppConstants.namespace: RequiredNamespace(
+          chains: ['${AppConstants.namespace}:${flavorSettings.chainId}'],
           methods: [
             'mvx_signTransaction',
             'mvx_signTransactions',
