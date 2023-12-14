@@ -44,8 +44,6 @@ Future<FlavorSettings> _getFlavorSettings() async {
       await const MethodChannel('flavor').invokeMethod<String>('getFlavor') ??
           '';
 
-  print('STARTED WITH FLAVOR $flavor');
-
   if (flavor == 'devnet') {
     return FlavorSettings.devnet();
   } else if (flavor == 'mainnet') {

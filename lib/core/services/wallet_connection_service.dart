@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:fluttertemplate/core/constants/app_constants.dart';
+import 'package:fluttertemplate/core/models/transaction.dart';
+import 'package:fluttertemplate/core/models/transaction_response.dart';
+import 'package:fluttertemplate/core/utils/apply_tx_signature.dart';
 import 'package:fluttertemplate/flavor_settings.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 
@@ -16,22 +19,7 @@ class WalletConnectionService {
       StreamController<void>.broadcast();
   Stream<void> get disconnectStream => _disconnectController.stream;
 
-  WalletConnectionService({required this.flavorSettings}) {
-    signClient.onSessionConnect.subscribe((SessionConnect? sessionConnect) {
-      if (sessionConnect != null) {
-        SessionData session = sessionConnect.session;
-        topic = session.topic;
-        _connectionController.add(session);
-      }
-    });
-
-    signClient.onSessionDelete.subscribe((SessionDelete? session) {
-      if (session != null) {
-        topic = '';
-        _disconnectController.add(null);
-      }
-    });
-  }
+  WalletConnectionService({required this.flavorSettings});
 
   String topic = '';
 
@@ -47,6 +35,25 @@ class WalletConnectionService {
         redirect: Redirect(native: 'myflutterdapp://', universal: null),
       ),
     );
+
+    initWsListeners();
+  }
+
+  initWsListeners() {
+    signClient.onSessionConnect.subscribe((SessionConnect? sessionConnect) {
+      if (sessionConnect != null) {
+        SessionData session = sessionConnect.session;
+        topic = session.topic;
+        _connectionController.add(session);
+      }
+    });
+
+    signClient.onSessionDelete.subscribe((SessionDelete? session) {
+      if (session != null) {
+        topic = '';
+        _disconnectController.add(null);
+      }
+    });
   }
 
   Future<String> connect() async {
@@ -76,6 +83,74 @@ class WalletConnectionService {
     signClient.disconnect(
       topic: topic,
       reason: Errors.getSdkError(Errors.USER_DISCONNECTED),
+    );
+  }
+
+  Future<List<Transaction>> requestSignTransactions(
+    List<Transaction> transactions,
+  ) async {
+    String method = transactions.length > 1
+        ? 'mvx_signTransactions'
+        : 'mvx_signTransaction';
+
+    Object params = transactions.length > 1
+        ? {'transactions': transactions.map((tx) => tx.toJson())}
+        : {'transaction': transactions[0].toJson()};
+
+    final dynamic signResponse = await signClient.request(
+      chainId: '${AppConstants.namespace}:${flavorSettings.chainId}',
+      topic: topic,
+      request: SessionRequestParams(
+        method: method,
+        params: params,
+      ),
+    );
+
+    List<Transaction> signedTransactions =
+        getSignedTransactions(signResponse, transactions);
+
+    return signedTransactions;
+  }
+
+  List<Transaction> getSignedTransactions(
+    dynamic signResponse,
+    List<Transaction> transactions,
+  ) {
+    List<TransactionResponse> transactionResponses = [];
+
+    if (signResponse is List) {
+      transactionResponses = signResponse
+          .map<TransactionResponse>(
+            (dynamic data) => parseTransactionResponse(data),
+          )
+          .toList();
+    } else {
+      transactionResponses.add(parseTransactionResponse(signResponse));
+    }
+
+    List<Transaction> signedTransactions = transactionResponses.map((response) {
+      return applyTransactionSignature(
+        transaction: transactions[transactionResponses.indexOf(response)],
+        response: response,
+      );
+    }).toList();
+
+    return signedTransactions;
+  }
+
+  TransactionResponse parseTransactionResponse(dynamic signResponse) {
+    if (signResponse == null || signResponse is! Map<String, dynamic>) {
+      throw ArgumentError('Invalid sign response format');
+    }
+
+    final Map<String, dynamic> responseMap = signResponse;
+
+    return TransactionResponse(
+      signature: responseMap['signature'],
+      guardian: responseMap['guardian'],
+      guardianSignature: responseMap['guardianSignature'],
+      options: responseMap['options'],
+      version: responseMap['version'],
     );
   }
 
