@@ -34,7 +34,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     SignTransactionsEvent event,
     Emitter<TransactionState> emit,
   ) async {
-    //todo check if its connected
+    if (!walletConnectionService.isConnected()) {
+      return;
+    }
 
     emit(state.copyWith(status: TransactionStatus.readyToSign));
 
@@ -47,7 +49,8 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
         ? {'transactions': transactions.map((tx) => tx.toJson())}
         : {'transaction': transactions[0].toJson()};
 
-    final dynamic signResponse = await walletConnectionService.wcClient.request(
+    final dynamic signResponse =
+        await walletConnectionService.signClient.request(
       chainId: '${AppConstants.namespace}:${flavorSettings.chainId}',
       topic: walletConnectionService.topic,
       request: SessionRequestParams(

@@ -23,24 +23,18 @@ class WalletConnectBloc extends Bloc<WalletConnectEvent, WalletConnectState> {
 
   Future<void> initWsListeners() async {
     Map<String, SessionData> sessions =
-        walletConnectionService.wcClient.getActiveSessions();
+        walletConnectionService.signClient.getActiveSessions();
     if (sessions.isNotEmpty) {
       SessionData sessionData = sessions.entries.first.value;
       add(WalletConnectedEvent(session: sessionData));
     }
 
-    walletConnectionService.wcClient.onSessionConnect
-        .subscribe((SessionConnect? session) {
-      if (session != null) {
-        add(WalletConnectedEvent(session: session.session));
-      }
+    walletConnectionService.connectionStream.listen((SessionData session) {
+      add(WalletConnectedEvent(session: session));
     });
 
-    walletConnectionService.wcClient.onSessionDelete
-        .subscribe((SessionDelete? session) {
-      if (session != null) {
-        add(const WalletDisconnectedEvent());
-      }
+    walletConnectionService.disconnectStream.listen((_) {
+      add(const WalletDisconnectedEvent());
     });
   }
 
@@ -67,14 +61,11 @@ class WalletConnectBloc extends Bloc<WalletConnectEvent, WalletConnectState> {
     DisconnectWalletEvent event,
     Emitter<WalletConnectState> emit,
   ) async {
-    if (!isConnected()) {
+    if (!walletConnectionService.isConnected()) {
       return;
     }
 
-    walletConnectionService.wcClient.disconnect(
-      topic: walletConnectionService.topic,
-      reason: Errors.getSdkError(Errors.USER_DISCONNECTED),
-    );
+    walletConnectionService.disconnect();
   }
 
   Future<void> walletConnected(
@@ -91,10 +82,5 @@ class WalletConnectBloc extends Bloc<WalletConnectEvent, WalletConnectState> {
     Emitter<WalletConnectState> emit,
   ) async {
     emit(const WalletConnectInitial());
-    walletConnectionService.topic = '';
-  }
-
-  bool isConnected() {
-    return state is WalletConnectConnected;
   }
 }

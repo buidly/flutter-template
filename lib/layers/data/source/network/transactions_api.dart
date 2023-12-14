@@ -15,7 +15,7 @@ class TransactionsApiImpl implements TransactionsApi {
   final Dio dio;
   final FlavorSettings flavorSettings;
 
-  TransactionsApiImpl({required this.dio, required this.flavorSettings});
+  const TransactionsApiImpl({required this.dio, required this.flavorSettings});
 
   @override
   Future<List<TransactionOnNetworkDto>> getTransactions(
