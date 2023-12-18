@@ -38,6 +38,14 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
 
     List<Transaction> signedTransactions = await walletConnectionService
         .requestSignTransactions(event.transactions);
+    if (signedTransactions.isEmpty) {
+      emit(
+        state.copyWith(
+          status: TransactionStatus.error,
+        ),
+      );
+      return;
+    }
 
     List<String> txHashes = await sendTransactions(signedTransactions);
     if (txHashes.isEmpty) {

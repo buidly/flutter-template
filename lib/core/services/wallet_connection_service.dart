@@ -89,27 +89,31 @@ class WalletConnectionService {
   Future<List<Transaction>> requestSignTransactions(
     List<Transaction> transactions,
   ) async {
-    String method = transactions.length > 1
-        ? 'mvx_signTransactions'
-        : 'mvx_signTransaction';
+    try {
+      String method = transactions.length > 1
+          ? 'mvx_signTransactions'
+          : 'mvx_signTransaction';
 
-    Object params = transactions.length > 1
-        ? {'transactions': transactions.map((tx) => tx.toJson())}
-        : {'transaction': transactions[0].toJson()};
+      Object params = transactions.length > 1
+          ? {'transactions': transactions.map((tx) => tx.toJson())}
+          : {'transaction': transactions[0].toJson()};
 
-    final dynamic signResponse = await signClient.request(
-      chainId: '${AppConstants.namespace}:${flavorSettings.chainId}',
-      topic: topic,
-      request: SessionRequestParams(
-        method: method,
-        params: params,
-      ),
-    );
+      final dynamic signResponse = await signClient.request(
+        chainId: '${AppConstants.namespace}:${flavorSettings.chainId}',
+        topic: topic,
+        request: SessionRequestParams(
+          method: method,
+          params: params,
+        ),
+      );
 
-    List<Transaction> signedTransactions =
-        getSignedTransactions(signResponse, transactions);
+      List<Transaction> signedTransactions =
+          getSignedTransactions(signResponse, transactions);
 
-    return signedTransactions;
+      return signedTransactions;
+    } catch (e) {
+      return List.empty();
+    }
   }
 
   List<Transaction> getSignedTransactions(
