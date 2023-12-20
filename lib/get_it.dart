@@ -27,7 +27,7 @@ Future<void> setupDependencies() async {
   ));
   getIt.registerSingleton<Alice>(
     Alice(
-      showNotification: kDebugMode,
+      showNotification: false,
       showInspectorOnShake: kDebugMode,
     ),
   );
