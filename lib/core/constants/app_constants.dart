@@ -10,7 +10,7 @@ class AppConstants {
 
   static const String origin = 'https://walletconnect.com';
 
-  static const int nativeAuthExpirySeconds = 7200;
+  static const int nativeAuthExpirySeconds = 604800;
 
   static const String nativeAuthTokenKey = 'nativeAuthTokenKey';
 }
