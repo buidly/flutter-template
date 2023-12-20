@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:fluttertemplate/core/constants/app_constants.dart';
 import 'package:fluttertemplate/core/models/transaction.dart';
 import 'package:fluttertemplate/core/models/transaction_response.dart';
+import 'package:fluttertemplate/core/services/native_auth_service.dart';
 import 'package:fluttertemplate/core/utils/apply_tx_signature.dart';
 import 'package:fluttertemplate/flavor_settings.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
@@ -10,6 +12,7 @@ import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 class WalletConnectionService {
   late final SignClient signClient;
   late final FlavorSettings flavorSettings;
+  late final NativeAuthService nativeAuthService;
 
   late final StreamController<SessionData> _connectionController =
       StreamController<SessionData>.broadcast();
@@ -19,7 +22,10 @@ class WalletConnectionService {
       StreamController<void>.broadcast();
   Stream<void> get disconnectStream => _disconnectController.stream;
 
-  WalletConnectionService({required this.flavorSettings});
+  WalletConnectionService({
+    required this.flavorSettings,
+    required this.nativeAuthService,
+  });
 
   String topic = '';
 
@@ -32,7 +38,7 @@ class WalletConnectionService {
         description: 'A dapp that can request that transactions be signed',
         url: 'https://walletconnect.com',
         icons: ['https://avatars.githubusercontent.com/u/37784886'],
-        redirect: Redirect(native: 'myflutterdapp://', universal: null),
+        redirect: Redirect(native: 'myflutterdapp://'),
       ),
     );
 
@@ -40,6 +46,15 @@ class WalletConnectionService {
   }
 
   initWsListeners() {
+    _connectionController.onListen = () {
+      Map<String, SessionData> sessions = signClient.getActiveSessions();
+      if (sessions.isNotEmpty) {
+        SessionData sessionData = sessions.entries.first.value;
+        topic = sessionData.topic;
+        _connectionController.add(sessionData);
+      }
+    };
+
     signClient.onSessionConnect.subscribe((SessionConnect? sessionConnect) {
       if (sessionConnect != null) {
         SessionData session = sessionConnect.session;
@@ -65,6 +80,7 @@ class WalletConnectionService {
             'mvx_signTransaction',
             'mvx_signTransactions',
             'mvx_signMessage',
+            'mvx_signNativeAuthToken',
           ],
           events: [],
         ),
@@ -112,7 +128,35 @@ class WalletConnectionService {
 
       return signedTransactions;
     } catch (e) {
+      debugPrint(e.toString());
       return List.empty();
+    }
+  }
+
+  Future<Map<String, String>> requestSignature(String address) async {
+    try {
+      String token = await nativeAuthService.initialize();
+      Object params = {'address': address, 'token': token};
+
+      final dynamic signResponse = await signClient.request(
+        chainId: '${AppConstants.namespace}:${flavorSettings.chainId}',
+        topic: topic,
+        request: SessionRequestParams(
+          method: 'mvx_signNativeAuthToken',
+          params: params,
+        ),
+      );
+
+      String signature = signResponse['signature'] ?? '';
+      String nativeAuth = nativeAuthService.getToken(address, token, signature);
+
+      return {
+        'signature': signResponse['signature'],
+        'nativeAuthToken': nativeAuth,
+      };
+    } catch (e) {
+      debugPrint(e.toString());
+      return <String, String>{};
     }
   }
 

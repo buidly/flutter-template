@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^6.2.2
   get_it: ^7.6.4
   alice: ^0.4.1
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

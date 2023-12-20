@@ -2,16 +2,20 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:fluttertemplate/core/constants/app_constants.dart';
 import 'package:fluttertemplate/core/services/wallet_connection_service.dart';
 import 'package:fluttertemplate/core/utils/get_address_from_session.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 part 'wallet_connect_event.dart';
 part 'wallet_connect_state.dart';
 
 class WalletConnectBloc extends Bloc<WalletConnectEvent, WalletConnectState> {
   late final WalletConnectionService walletConnectionService;
+  late final SharedPreferences prefs;
 
-  WalletConnectBloc(this.walletConnectionService)
+  WalletConnectBloc(
+      {required this.walletConnectionService, required this.prefs})
       : super(const WalletConnectInitial()) {
     on<ConnectWalletEvent>(connectWallet);
     on<WalletConnectedEvent>(walletConnected);
@@ -22,13 +26,6 @@ class WalletConnectBloc extends Bloc<WalletConnectEvent, WalletConnectState> {
   }
 
   Future<void> initWsListeners() async {
-    Map<String, SessionData> sessions =
-        walletConnectionService.signClient.getActiveSessions();
-    if (sessions.isNotEmpty) {
-      SessionData sessionData = sessions.entries.first.value;
-      add(WalletConnectedEvent(session: sessionData));
-    }
-
     walletConnectionService.connectionStream.listen((SessionData session) {
       add(WalletConnectedEvent(session: session));
     });
@@ -73,14 +70,22 @@ class WalletConnectBloc extends Bloc<WalletConnectEvent, WalletConnectState> {
     Emitter<WalletConnectState> emit,
   ) async {
     String address = getAddressFromSession(event.session);
-    walletConnectionService.topic = event.session.topic;
     emit(WalletConnectConnected(address: address));
+
+    String? nativeAuthToken = prefs.getString(AppConstants.nativeAuthTokenKey);
+    if (nativeAuthToken == null) {
+      Map<String, String> signatureResponse =
+          await walletConnectionService.requestSignature(address);
+      String nativeAuthToken = signatureResponse['nativeAuthToken'] ?? '';
+      prefs.setString(AppConstants.nativeAuthTokenKey, nativeAuthToken);
+    }
   }
 
   Future<void> walletDisconnected(
     WalletDisconnectedEvent event,
     Emitter<WalletConnectState> emit,
   ) async {
+    prefs.remove(AppConstants.nativeAuthTokenKey);
     emit(const WalletConnectInitial());
   }
 }

@@ -14,6 +14,7 @@ import 'package:fluttertemplate/layers/presentation/using_bloc/transaction/bloc/
 import 'package:fluttertemplate/layers/presentation/using_bloc/transaction/view/sign_transaction_button.dart';
 import 'package:fluttertemplate/layers/presentation/using_bloc/wallet_connect/bloc/wallet_connect_bloc.dart';
 import 'package:fluttertemplate/layers/presentation/using_bloc/wallet_connect/view/wallet_connect_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final FlavorSettings flavorSettings = getIt<FlavorSettings>();
   final WalletConnectionService walletConnService =
       getIt<WalletConnectionService>();
+  final SharedPreferences sharedPreferences = getIt<SharedPreferences>();
 
   @override
   void initState() {
@@ -109,7 +111,10 @@ class _MyHomePageState extends State<MyHomePage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider<WalletConnectBloc>(
-          create: (_) => WalletConnectBloc(walletConnService),
+          create: (_) => WalletConnectBloc(
+            walletConnectionService: walletConnService,
+            prefs: sharedPreferences,
+          ),
         ),
         BlocProvider<TransactionBloc>(
           create: (_) => TransactionBloc(

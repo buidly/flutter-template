@@ -7,4 +7,10 @@ class AppConstants {
   static const String relayUrl = 'wss://relay.walletconnect.com';
 
   static const String projectId = 'f51709386f567b1251dd41c996a9299c';
+
+  static const String origin = 'https://walletconnect.com';
+
+  static const int nativeAuthExpirySeconds = 7200;
+
+  static const String nativeAuthTokenKey = 'nativeAuthTokenKey';
 }

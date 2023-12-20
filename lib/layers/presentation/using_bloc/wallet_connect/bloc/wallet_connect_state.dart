@@ -18,7 +18,9 @@ class WalletConnectLoading extends WalletConnectState {
 class WalletConnectConnected extends WalletConnectState {
   final String address;
 
-  const WalletConnectConnected({required this.address});
+  const WalletConnectConnected({
+    required this.address,
+  });
 
   @override
   List<Object> get props => [address];
