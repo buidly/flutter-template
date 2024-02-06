@@ -1,19 +1,19 @@
 # Uncomment this line to define a global platform for your project
-# platform :ios, '11.0'
+# platform :ios, '12.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
 project 'Runner', {
-  'Debug-devnet' => :debug,
-  'Debug-testnet' => :debug,
-  'Debug-mainnet' => :debug,
-  'Profile-devnet' => :release,
-  'Profile-testnet' => :release,
-  'Profile-mainnet' => :release,
-  'Release-devnet' => :release,
-  'Release-testnet' => :release,
-  'Release-mainnet' => :release,
+  'Debug-dev' => :debug,
+  'Debug-qa' => :debug,
+  'Debug-prod' => :debug,
+  'Profile-dev' => :release,
+  'Profile-qa' => :release,
+  'Profile-prod' => :release,
+  'Release-dev' => :release,
+  'Release-qa' => :release,
+  'Release-prod' => :release,
 }
 
 def flutter_root

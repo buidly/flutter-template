@@ -14,9 +14,10 @@ class WalletConnectBloc extends Bloc<WalletConnectEvent, WalletConnectState> {
   late final WalletConnectionService walletConnectionService;
   late final SharedPreferences prefs;
 
-  WalletConnectBloc(
-      {required this.walletConnectionService, required this.prefs})
-      : super(const WalletConnectInitial()) {
+  WalletConnectBloc({
+    required this.walletConnectionService,
+    required this.prefs,
+  }) : super(const WalletConnectInitial()) {
     on<ConnectWalletEvent>(connectWallet);
     on<WalletConnectedEvent>(walletConnected);
     on<DisconnectWalletEvent>(disconnectWallet);

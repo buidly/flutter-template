@@ -2,13 +2,13 @@ class FlavorSettings {
   final String apiUrl;
   final String chainId;
 
-  FlavorSettings.devnet()
+  FlavorSettings.dev()
       : apiUrl = 'https://devnet-api.multiversx.com',
         chainId = 'D';
-  FlavorSettings.testnet()
+  FlavorSettings.qa()
       : apiUrl = 'https://testnet-api.multiversx.com',
         chainId = 'T';
-  FlavorSettings.mainnet()
+  FlavorSettings.prod()
       : apiUrl = 'https://api.multiversx.com',
         chainId = '1';
 }

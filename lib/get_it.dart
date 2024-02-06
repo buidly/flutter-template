@@ -59,12 +59,12 @@ Future<FlavorSettings> _getFlavorSettings() async {
       await const MethodChannel('flavor').invokeMethod<String>('getFlavor') ??
           '';
 
-  if (flavor == 'devnet') {
-    return FlavorSettings.devnet();
-  } else if (flavor == 'mainnet') {
-    return FlavorSettings.mainnet();
-  } else if (flavor == 'testnet') {
-    return FlavorSettings.testnet();
+  if (flavor == 'dev') {
+    return FlavorSettings.dev();
+  } else if (flavor == 'prod') {
+    return FlavorSettings.prod();
+  } else if (flavor == 'qa') {
+    return FlavorSettings.qa();
   } else {
     throw Exception("Unknown flavor: $flavor");
   }

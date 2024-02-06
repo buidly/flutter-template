@@ -54,17 +54,17 @@ android {
     flavorDimensions "default"
 
     productFlavors {
-        devnet {
+        dev {
             dimension "default"
-            resValue "string", "app_name", "App Devnet"
-            applicationIdSuffix ".devnet"
+            resValue "string", "app_name", "App dev"
+            applicationIdSuffix ".dev"
         }
-        testnet {
+        qa {
             dimension "default"
-            resValue "string", "app_name", "App Testnet"
-            applicationIdSuffix ".testnet"
+            resValue "string", "app_name", "App qa"
+            applicationIdSuffix ".qa"
         }
-        mainnet {
+        prod {
             dimension "default"
             resValue "string", "app_name", "App"
             applicationIdSuffix ""
