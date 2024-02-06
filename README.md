@@ -6,41 +6,37 @@ This Flutter project serves as a template for connecting to xPortal and signing 
 
 ## Getting Started
 
-To begin, use the following command:
+To begin, use the following command to run the app:
 
-````bash
+```bash
 flutter run --flavor <flavor>
-```
-
 Replace <flavor> with dev, qa, or prod based on your environment.
+```
 
 ## Connection and Authentication
 
 Use the WalletConnectButton widget for connection and disconnection. If separate buttons are needed, interact directly with the WalletConnectBloc:
 
-To connect:
 ```bash
+# To connect:
 walletConnectBloc.add(const ConnectWalletEvent());
-```
 
-To disconnect:
-```bash
+# To disconnect:
 walletConnectBloc.add(const DisconnectWalletEvent());
-```
 
-If you want to further authenticate your requests, you can use native auth token:
-```bash
+# If you want to authenticate your requests, you can use native auth token:
 SharedPreferences.getString(AppConstants.nativeAuthTokenKey);
 ```
 
 ## Transaction Signing
+
 Sign transactions with the SignTransactionButton widget. The TransactionBloc listens to the SignTransactionsEvent event, requiring a list of unsigned transactions.
 
 Note: A dummy EGLD transfer transaction is hardcoded. To test, fill in the sender, receiver, and set the correct nonce for the sender:
 
 ```bash
 Transaction(
-  nonce: 0,
+  nonce: 0, // set nonce of the sender
   value: '1000000000000000',
   sender: '', // Fill in sender address
   receiver: '', // Fill in receiver address
@@ -54,4 +50,3 @@ Transaction(
 ```
 
 Feel free to adapt the template to meet your specific needs.
-````
