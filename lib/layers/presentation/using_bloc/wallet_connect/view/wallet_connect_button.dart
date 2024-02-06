@@ -37,7 +37,7 @@ class WalletConnectView extends StatelessWidget {
           fixedSize: const Size(130.0, 45.0),
         ),
         onPressed: () {
-          if (walletConnectBloc.state.runtimeType == WalletConnectConnected) {
+          if (walletConnectBloc.state is WalletConnectConnected) {
             walletConnectBloc.add(const DisconnectWalletEvent());
           } else {
             walletConnectBloc.add(const ConnectWalletEvent());
