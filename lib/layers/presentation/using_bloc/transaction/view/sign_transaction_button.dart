@@ -36,12 +36,10 @@ class SignTransactionView extends StatelessWidget {
               transactions: List.filled(
                 1,
                 Transaction(
-                  nonce: 4,
+                  nonce: 0,
                   value: '1000000000000000',
-                  sender:
-                      'erd1py6qag6gwu9tl6p0lagd9e379jpes9h8rkg4zq038vkzm2g46uzqu577gx',
-                  receiver:
-                      'erd1325shnt4zaw6fnrwhalfr3jdyz0hlc3r7hghef5qk6v7lpdhz2tseevl78',
+                  sender: '',
+                  receiver: '',
                   gasPrice: 1000000000,
                   gasLimit: 70000,
                   data: '',
